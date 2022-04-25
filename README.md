@@ -4,7 +4,7 @@
 
 ![YouTube embed blocked](blocked.png)
 
-Install this Powercord plugin to circumvents YouTube embed restrictions
+Install this Powercord plugin to circumvent YouTube embed restrictions
 
 # Requirements
 
