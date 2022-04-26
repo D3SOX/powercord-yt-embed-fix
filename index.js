@@ -1,5 +1,6 @@
 const { Plugin } = require('powercord/entities');
 const { inject, uninject } = require('powercord/injector');
+const { get } = require('powercord/http');
 const { getModule } = require('powercord/webpack');
 
 module.exports = class YTEmbedFix extends Plugin {
@@ -24,9 +25,8 @@ module.exports = class YTEmbedFix extends Plugin {
                                 //this.log('[YT EMBED FIX] found YouTube embed', context, video, video.url);
 
                                 // region only forward blocked embeds
-                                // this is cursed, but I don't want to host my own proxy for this
-                                fetch(`https://api.allorigins.win/get?url=${video.url}`).then(res => res.json()).then(data => {
-                                    const { contents } = data;
+                                get(video.url).then(res => {
+                                    const contents = res.body.toString()
                                     //this.log('[YT EMBED FIX] res', contents);
 
                                     // blocked embeds contain this meta tag
