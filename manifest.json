@@ -3,5 +3,6 @@
     "version": "1.0.0",
     "description": "Circumvent YouTube embed restrictions",
     "author": "D3SOX",
-    "license": "GPL-3.0"
+    "license": "GPL-3.0",
+    "permissions": [ "ext_api" ],
 }
