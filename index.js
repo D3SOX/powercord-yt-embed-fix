@@ -8,7 +8,7 @@ const Settings = require('./components/Settings.jsx');
 module.exports = class YTEmbedFix extends Plugin {
     startPlugin() {
         const { MessageAccessories } = getModule(['MessageAccessories'], false);
-        inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
+        inject('yt-embed-fix', MessageAccessories.prototype, 'render', (_args, res) => {
             // find message embeds
             const children = res?.props?.children;
             if (!children || children.length < 9) {
