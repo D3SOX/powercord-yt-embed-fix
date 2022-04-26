@@ -49,8 +49,8 @@ module.exports = class YTEmbedFix extends Plugin {
                             replaceEmbed();
                         } else {
                             // only forward blocked embeds
-                            get(url).then(res => {
-                                const contents = res.body.toString();
+                            get(url).then(response => {
+                                const contents = response.body.toString();
 
                                 // blocked embeds contain this meta tag
                                 if (contents.includes('name="robots" content="noindex"')) {
