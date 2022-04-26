@@ -4,5 +4,5 @@
     "description": "Circumvent YouTube embed restrictions",
     "author": "D3SOX",
     "license": "GPL-3.0",
-    "permissions": [ "ext_api" ],
+    "permissions": [ "ext_api" ]
 }
