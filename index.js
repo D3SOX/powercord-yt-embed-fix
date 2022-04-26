@@ -8,40 +8,47 @@ module.exports = class YTEmbedFix extends Plugin {
         const { MessageAccessories } = await getModule(['MessageAccessories'], false);
         inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
             const children = res?.props?.children;
-            if (children && children.length >= 9) {
-                const context = children[8];
-                const embeds = context?.props?.message?.embeds;
-                if (embeds && embeds.length) {
-                    for (const embed of embeds) {
-                        const video = embed.video;
-                        if (video) {
-                            if (video.url.includes('youtube.com/embed/')) {
-                                // region only forward blocked embeds
-                                get(video.url).then(res => {
-                                    const contents = res.body.toString();
+            if (!children || children.length < 9) {
+                return res;
+            }
 
-                                    // blocked embeds contain this meta tag
-                                    if (contents.includes('name="robots" content="noindex"')) {
-                                        const { url } = video;
-                                        const urlObject = new URL(url);
-                                        //urlObject.hostname = 'invidious.snopyta.org';
-                                        //urlObject.hostname = 'invidio.us';
-                                        urlObject.hostname = 'invidious.weblibre.org';
-                                        video.url = urlObject.toString();
-                                    }
-                                });
-                                // endregion
+            const context = children[8];
+            if (!context) {
+                return res;
+            }
 
-                                // region forward all videos
-                                /*const { url } = video;
+            const embeds = context?.props?.message?.embeds;
+            if (!embeds || !embeds.length) {
+                return res;
+            }
+
+            for (const embed of embeds) {
+                const { video } = embed;
+                if (video) {
+                    const { url } = video;
+                    if (url && url.includes('youtube.com/embed/')) {
+                        // region only forward blocked embeds
+                        get(url).then(res => {
+                            const contents = res.body.toString();
+
+                            // blocked embeds contain this meta tag
+                            if (contents.includes('name="robots" content="noindex"')) {
                                 const urlObject = new URL(url);
                                 //urlObject.hostname = 'invidious.snopyta.org';
                                 //urlObject.hostname = 'invidio.us';
                                 urlObject.hostname = 'invidious.weblibre.org';
-                                video.url = urlObject.toString();*/
-                                // endregion
+                                video.url = urlObject.toString();
                             }
-                        }
+                        });
+                        // endregion
+
+                        // region forward all videos
+                        /*const urlObject = new URL(url);
+                        //urlObject.hostname = 'invidious.snopyta.org';
+                        //urlObject.hostname = 'invidio.us';
+                        urlObject.hostname = 'invidious.weblibre.org';
+                        video.url = urlObject.toString();*/
+                        // endregion
                     }
                 }
             }
