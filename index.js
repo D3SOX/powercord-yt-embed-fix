@@ -9,6 +9,7 @@ module.exports = class YTEmbedFix extends Plugin {
     startPlugin() {
         const { MessageAccessories } = getModule(['MessageAccessories'], false);
         inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
+            // find message embeds
             const children = res?.props?.children;
             if (!children || children.length < 9) {
                 return res;
@@ -24,6 +25,7 @@ module.exports = class YTEmbedFix extends Plugin {
                 return res;
             }
 
+            // get settings
             const replaceAllEmbeds = this.settings.get('replaceAllEmbeds');
             const invidiousInstance = this.settings.get('invidiousInstance');
 
@@ -31,9 +33,13 @@ module.exports = class YTEmbedFix extends Plugin {
                 const { video } = embed;
                 if (video) {
                     const { url } = video;
+                    // we only want to modify YouTube embeds
+                    // TODO: maybe add support for other privacy oriented sites like Nitter, ProxiTok, Bibliogram, ...
                     if (url && url.includes('youtube.com/embed/')) {
+                        // inline helper function that replaces the YouTube embed with an invidious one
                         const replaceEmbed = () => {
                             const urlObject = new URL(url);
+                            // invidious embed urls follow the same pattern as YouTube embed urls, so we can just replace the hostname
                             urlObject.hostname = invidiousInstance;
                             video.url = urlObject.toString();
                         };
