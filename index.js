@@ -8,30 +8,22 @@ module.exports = class YTEmbedFix extends Plugin {
     async startPlugin() {
         const { MessageAccessories } = await getModule(['MessageAccessories'], false);
         inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
-            //this.log('[YT EMBED FIX] MessageAccessories', res);
             const children = res?.props?.children;
-            //this.log('[YT EMBED FIX] children', children);
             if (children && children.length >= 9) {
                 const context = children[8];
-                //this.log('[YT EMBED FIX] context', context);
                 const embeds = context?.props?.message?.embeds;
-                //this.log('[YT EMBED FIX] embeds', embeds);
                 if (embeds && embeds.length) {
-                    //this.log('[YT EMBED FIX] found message with embeds', embeds);
                     for (const embed of embeds) {
                         const video = embed.video;
                         if (video) {
                             if (video.url.includes('youtube.com/embed/')) {
-                                //this.log('[YT EMBED FIX] found YouTube embed', context, video, video.url);
 
                                 // region only forward blocked embeds
                                 get(video.url).then(res => {
                                     const contents = res.body.toString()
-                                    //this.log('[YT EMBED FIX] res', contents);
 
                                     // blocked embeds contain this meta tag
                                     if (contents.includes('name="robots" content="noindex"')) {
-                                        //this.log('[YT EMBED FIX] replace unavailable youtube embed', context, video, video.url);
                                         const { url } = video;
                                         const urlObject = new URL(url);
                                         //urlObject.hostname = 'invidious.snopyta.org';
