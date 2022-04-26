@@ -4,7 +4,6 @@ const { get } = require('powercord/http');
 const { getModule } = require('powercord/webpack');
 
 module.exports = class YTEmbedFix extends Plugin {
-
     async startPlugin() {
         const { MessageAccessories } = await getModule(['MessageAccessories'], false);
         inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
@@ -17,10 +16,9 @@ module.exports = class YTEmbedFix extends Plugin {
                         const video = embed.video;
                         if (video) {
                             if (video.url.includes('youtube.com/embed/')) {
-
                                 // region only forward blocked embeds
                                 get(video.url).then(res => {
-                                    const contents = res.body.toString()
+                                    const contents = res.body.toString();
 
                                     // blocked embeds contain this meta tag
                                     if (contents.includes('name="robots" content="noindex"')) {
@@ -55,5 +53,4 @@ module.exports = class YTEmbedFix extends Plugin {
     pluginWillUnload() {
         uninject('yt-embed-fix');
     }
-
 };
