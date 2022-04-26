@@ -3,6 +3,8 @@ const { inject, uninject } = require('powercord/injector');
 const { get } = require('powercord/http');
 const { getModule } = require('powercord/webpack');
 
+const Settings = require('./components/Settings.jsx');
+
 module.exports = class YTEmbedFix extends Plugin {
     startPlugin() {
         const { MessageAccessories } = getModule(['MessageAccessories'], false);
@@ -22,42 +24,50 @@ module.exports = class YTEmbedFix extends Plugin {
                 return res;
             }
 
+            const replaceAllEmbeds = this.settings.get('replaceAllEmbeds');
+            const invidiousInstance = this.settings.get('invidiousInstance');
+
             for (const embed of embeds) {
                 const { video } = embed;
                 if (video) {
                     const { url } = video;
                     if (url && url.includes('youtube.com/embed/')) {
-                        // region only forward blocked embeds
-                        get(url).then(res => {
-                            const contents = res.body.toString();
+                        const replaceEmbed = () => {
+                            const urlObject = new URL(url);
+                            urlObject.hostname = invidiousInstance;
+                            video.url = urlObject.toString();
+                        };
 
-                            // blocked embeds contain this meta tag
-                            if (contents.includes('name="robots" content="noindex"')) {
-                                const urlObject = new URL(url);
-                                //urlObject.hostname = 'invidious.snopyta.org';
-                                //urlObject.hostname = 'invidio.us';
-                                urlObject.hostname = 'invidious.weblibre.org';
-                                video.url = urlObject.toString();
-                            }
-                        });
-                        // endregion
+                        if (replaceAllEmbeds) {
+                            // forward all videos
+                            replaceEmbed();
+                        } else {
+                            // only forward blocked embeds
+                            get(url).then(res => {
+                                const contents = res.body.toString();
 
-                        // region forward all videos
-                        /*const urlObject = new URL(url);
-                        //urlObject.hostname = 'invidious.snopyta.org';
-                        //urlObject.hostname = 'invidio.us';
-                        urlObject.hostname = 'invidious.weblibre.org';
-                        video.url = urlObject.toString();*/
-                        // endregion
+                                // blocked embeds contain this meta tag
+                                if (contents.includes('name="robots" content="noindex"')) {
+                                    replaceEmbed();
+                                }
+                            });
+                        }
                     }
                 }
             }
 
             return res;
         });
+
+        powercord.api.settings.registerSettings(this.entityID, {
+            category: this.entityID,
+            label: 'YouTube Embed Fix',
+            render: Settings,
+        });
     }
 
     pluginWillUnload() {
         uninject('yt-embed-fix');
+        powercord.api.settings.unregisterSettings(this.entityID);
     }
 };
