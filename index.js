@@ -4,8 +4,8 @@ const { get } = require('powercord/http');
 const { getModule } = require('powercord/webpack');
 
 module.exports = class YTEmbedFix extends Plugin {
-    async startPlugin() {
-        const { MessageAccessories } = await getModule(['MessageAccessories'], false);
+    startPlugin() {
+        const { MessageAccessories } = getModule(['MessageAccessories'], false);
         inject('yt-embed-fix', MessageAccessories.prototype, 'render', (args, res) => {
             const children = res?.props?.children;
             if (!children || children.length < 9) {
