@@ -26,8 +26,8 @@ module.exports = class YTEmbedFix extends Plugin {
             }
 
             // get settings
-            const replaceAllEmbeds = this.settings.get('replaceAllEmbeds');
-            const invidiousInstance = this.settings.get('invidiousInstance');
+            const replaceAllEmbeds = this.settings.get('replaceAllEmbeds', false);
+            const invidiousInstance = this.settings.get('invidiousInstance', 'invidious.weblibre.org');
 
             for (const embed of embeds) {
                 const { video } = embed;
